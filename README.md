@@ -12,6 +12,12 @@ No login, no app to install, no ads, no subscription. Just open the link and let
 
 [![Jane's Learning World — 45s commercial](https://img.youtube.com/vi/Zt6d_NmvqB8/maxresdefault.jpg)](https://www.youtube.com/watch?v=Zt6d_NmvqB8)
 
+### 🎓 Watch a kid play — 10 minutes (safe for kids to watch)
+
+[![10-minute kid gameplay — Made for Kids](https://img.youtube.com/vi/M3unvrNs1xs/maxresdefault.jpg)](https://www.youtube.com/watch?v=M3unvrNs1xs)
+
+> *Math, reading, phonics, sight words. Marked Made for Kids on YouTube.*
+
 ---
 
 ## What it is
