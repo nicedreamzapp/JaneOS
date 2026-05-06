@@ -620,7 +620,7 @@ def _tts_clear_and_stop():
 
 async def api_say(req):
     """Synthesize text and return WAV bytes — browser plays them.
-    This makes audio work for REMOTE users (not just on the Mac speaker)."""
+    Optionally dumps each WAV to disk with a timestamp for post-process video assembly."""
     import wave, io
     body = await req.json()
     text = (body.get("text") or "").strip()
@@ -639,6 +639,28 @@ async def api_say(req):
         return buf.getvalue()
 
     data = await asyncio.get_event_loop().run_in_executor(None, synth)
+
+    # Optional: dump WAVs with relative-to-start timestamp for video recording
+    dump_dir = os.environ.get("JANEOS_TTS_DUMP")
+    if dump_dir:
+        try:
+            os.makedirs(dump_dir, exist_ok=True)
+            stamp_file = os.path.join(dump_dir, "_t0.txt")
+            if not os.path.exists(stamp_file):
+                with open(stamp_file, "w") as f:
+                    f.write(str(time.time()))
+                t0 = time.time()
+            else:
+                t0 = float(open(stamp_file).read().strip())
+            offset = time.time() - t0
+            wav_path = os.path.join(dump_dir, f"{offset:08.3f}.wav")
+            with open(wav_path, "wb") as f:
+                f.write(data)
+            with open(os.path.join(dump_dir, "manifest.txt"), "a") as f:
+                f.write(f"{offset:.3f}\t{clean}\n")
+        except Exception as e:
+            print(f"[tts dump] {e}")
+
     return web.Response(
         body=data,
         headers={
