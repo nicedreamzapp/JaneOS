@@ -2,11 +2,11 @@
 
 > **What it is:** a voice-guided AI tutor for kids ages 5–7 (kindergarten through 2nd grade). Free. Open source. Runs on your computer. No subscription, no ads, no in-app purchases — ever.
 
-### 📺 Watch a kid play (10 minutes, safe for kids to watch)
+### 📺 Watch the demo (45 seconds)
 
-[![10-minute kid gameplay](https://img.youtube.com/vi/utoQ2ecsm64/maxresdefault.jpg)](https://www.youtube.com/watch?v=utoQ2ecsm64)
+[![Jane's Learning World — 45s commercial](https://img.youtube.com/vi/Zt6d_NmvqB8/maxresdefault.jpg)](https://www.youtube.com/watch?v=Zt6d_NmvqB8)
 
-> *A real 10-minute session with Bloom — the warm voice you hear is the in-game tutor talking to your kid. Marked Made for Kids on YouTube.*
+> *A quick tour of Bloom — themes, activities, the voice. Voice clone of Daddy.*
 
 🎮 **Live demo (try it on a phone or tablet right now):** https://golf-dried-pierre-harry.trycloudflare.com
 
