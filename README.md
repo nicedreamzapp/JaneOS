@@ -8,7 +8,7 @@
 
 > *A quick tour of Bloom — themes, activities, the voice. Voice clone of Daddy.*
 
-🎮 **Live demo (try it on a phone or tablet right now):** https://golf-dried-pierre-harry.trycloudflare.com
+🎮 **Live demo (try it on a phone or tablet right now):** https://jane.nicedreamzwholesale.com
 
 ---
 
