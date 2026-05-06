@@ -1,6 +1,6 @@
 # Bloom — a free learning app for 1st graders
 
-A voice-guided tutor for kids ages 5–7. Built by a parent, for one kid, free for everyone.
+A voice-guided tutor for first graders. Built by a parent, free for everyone.
 
 ### 🎮 Play it now (any phone, tablet, or computer)
 
@@ -22,7 +22,7 @@ No login, no app to install, no ads, no subscription. Just open the link and let
 
 ## What it is
 
-A friendly tutor named Bloom that teaches reading, phonics, math, writing, science, social studies, and feelings — through bite-sized 60–90 second activities your kid actually wants to do.
+A friendly tutor named Bloom that teaches first-grade reading, phonics, math, writing, science, social studies, and feelings — through bite-sized 60–90 second activities your kid actually wants to do.
 
 Pick a world: 🦄 unicorns · 🧜‍♀️ mermaids · 🦕 dinosaurs · 🚀 space · 🐱 cats · 🐴 horses · 🐶 Bluey
 
