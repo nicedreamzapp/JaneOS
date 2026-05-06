@@ -1,0 +1,25 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Voice models — too large for git, downloaded by setup.sh
+voices/*.onnx
+voices/*.onnx.json
+
+# Local data — SQLite contains kid's progress, no need to push
+data/
+
+# Build artifacts
+video/build/
+build/
+
+# Dotfiles
+.DS_Store
+.env
+*.log
+
+# Music tracks — CC-BY licensed, not redistributing
+video/build/*.mp3
+bin/

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JaneOS · Parent Dashboard</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, sans-serif; background: #0e1230; color: #f6fbff; margin: 0; padding: 24px; }
+  h1 { color: #6ee7ff; margin: 0 0 8px; }
+  .sub { color: #b9d6ea; margin: 0 0 24px; font-size: 14px; }
+  .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { background: rgba(110,231,255,0.08); border: 1px solid rgba(110,231,255,0.3); border-radius: 10px; padding: 12px 16px; min-width: 120px; }
+  .stat .num { font-size: 28px; font-weight: 800; color: #6ee7ff; line-height: 1; }
+  .stat .lbl { font-size: 11px; color: #b9d6ea; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 14px; }
+  th { color: #6ee7ff; font-weight: 600; }
+  .bar { background: rgba(255,255,255,0.08); height: 10px; border-radius: 5px; overflow: hidden; min-width: 120px; }
+  .bar > div { height: 100%; background: linear-gradient(90deg, #ff3aa1, #6ee7ff); transition: width 400ms; }
+  a { color: #6ee7ff; }
+  .skill-name { color: #fff; font-weight: 600; }
+  .pct { font-variant-numeric: tabular-nums; color: #b9d6ea; min-width: 50px; text-align: right; }
+</style>
+</head>
+<body>
+<h1>JaneOS · Parent Dashboard</h1>
+<p class="sub">What Jane is mastering, struggling with, and how she spent her time.</p>
+
+<div class="card">
+  <div class="row" id="kpis"></div>
+</div>
+
+<div class="card">
+  <h3>Skill Mastery</h3>
+  <table id="mastery-table">
+    <thead><tr><th>Skill</th><th>Mastery</th><th>%</th><th>Attempts</th><th>Correct</th><th>Last seen</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Recent sessions</h3>
+  <table id="sessions-table">
+    <thead><tr><th>Started</th><th>Theme</th><th>Activities</th><th>Minutes</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<p><a href="/">← back to Jane's app</a></p>
+
+<script>
+async function load() {
+  const s = await (await fetch("/api/state")).json();
+  const m = await (await fetch("/api/mastery")).json();
+  const totalAttempts = m.mastery.reduce((a,b)=>a+b.attempts,0);
+  const totalCorrect = m.mastery.reduce((a,b)=>a+b.correct,0);
+  const skillsTouched = m.mastery.length;
+  const masteredCount = m.mastery.filter(x=>x.score>=0.85).length;
+  document.getElementById("kpis").innerHTML = `
+    <div class="stat"><div class="num">${totalAttempts}</div><div class="lbl">Total attempts</div></div>
+    <div class="stat"><div class="num">${totalCorrect}</div><div class="lbl">Correct</div></div>
+    <div class="stat"><div class="num">${totalAttempts ? Math.round(100*totalCorrect/totalAttempts) : 0}%</div><div class="lbl">Accuracy</div></div>
+    <div class="stat"><div class="num">${skillsTouched}</div><div class="lbl">Skills touched</div></div>
+    <div class="stat"><div class="num">${masteredCount}</div><div class="lbl">Mastered (≥85%)</div></div>
+    <div class="stat"><div class="num">${s.model.split('-')[0]}</div><div class="lbl">Tutor brain</div></div>
+  `;
+  const tbody = document.querySelector("#mastery-table tbody");
+  tbody.innerHTML = "";
+  m.mastery.sort((a,b)=>b.score-a.score).forEach(r => {
+    const pct = Math.round(r.score*100);
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td class="skill-name">${r.skill}</td>
+        <td><div class="bar"><div style="width:${pct}%"></div></div></td>
+        <td class="pct">${pct}%</td>
+        <td>${r.attempts}</td>
+        <td>${r.correct}</td>
+        <td>${r.last_seen ? new Date(r.last_seen).toLocaleString() : "—"}</td>
+      </tr>
+    `);
+  });
+}
+load();
+</script>
+</body>
+</html>

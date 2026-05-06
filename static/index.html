@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Jane's Learning World</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- canvas just for the celebrate confetti -->
+<canvas id="confetti"></canvas>
+
+<!-- Welcome / theme picker -->
+<section id="welcome" class="screen active">
+  <h1 class="big-title">Hi <span id="welcome-name">Jane</span>!</h1>
+  <p class="big-sub">Where do you want to play today?</p>
+  <div class="theme-grid">
+    <button class="theme-card" data-theme="unicorns"><span class="emoji">🦄</span><span>Unicorns</span></button>
+    <button class="theme-card" data-theme="mermaids"><span class="emoji">🧜‍♀️</span><span>Mermaids</span></button>
+    <button class="theme-card" data-theme="dinos"><span class="emoji">🦕</span><span>Dinosaurs</span></button>
+    <button class="theme-card" data-theme="space"><span class="emoji">🚀</span><span>Space</span></button>
+    <button class="theme-card" data-theme="cats"><span class="emoji">🐱</span><span>Cats</span></button>
+    <button class="theme-card" data-theme="horses"><span class="emoji">🐴</span><span>Horses</span></button>
+    <button class="theme-card" data-theme="bluey"><span class="emoji">🐶</span><span>Bluey</span></button>
+    <button class="theme-card surprise" data-theme="surprise"><span class="emoji">🎁</span><span>Surprise me!</span></button>
+  </div>
+  <button id="parent-btn" class="parent-link">parent dashboard</button>
+</section>
+
+<!-- Lesson screen -->
+<section id="lesson" class="screen">
+  <header class="hud">
+    <div class="stickers" id="stickers"></div>
+    <button id="break-btn" class="break-btn" title="Take a break">break</button>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="bubble" id="bubble">
+      <p class="said" id="said"></p>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+
+  <footer class="actions">
+    <button id="repeat-btn" class="repeat-btn" title="say it again">🔊 say again</button>
+    <button id="next-btn" class="next-btn hidden">next ▶</button>
+  </footer>
+</section>
+
+<!-- Celebrate overlay -->
+<div id="celebrate" class="celebrate hidden">
+  <div class="big-star">⭐</div>
+  <p id="celebrate-text"></p>
+</div>
+
+<!-- Setup modal (first launch) -->
+<div id="setup" class="modal hidden">
+  <div class="modal-card">
+    <h2>Welcome!</h2>
+    <p>What's your name?</p>
+    <input id="setup-name" type="text" value="Jane" />
+    <p>Pick a tutor name:</p>
+    <input id="setup-tutor" type="text" value="Bloom" />
+    <button id="setup-save">Start!</button>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

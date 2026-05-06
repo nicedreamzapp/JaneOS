@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.janeos.server</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/matthewmacosko/Desktop/PROJECTS/JaneOS/.venv/bin/python3</string>
+        <string>-u</string>
+        <string>/Users/matthewmacosko/Desktop/PROJECTS/JaneOS/server.py</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/matthewmacosko/Desktop/PROJECTS/JaneOS</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/janeos.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/janeos.log</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>ANTHROPIC_API_KEY</key>
+        <string>__REPLACE_WITH_KEY__</string>
+        <key>JANEOS_MODEL</key>
+        <string>claude-haiku-4-5-20251001</string>
+    </dict>
+</dict>
+</plist>
