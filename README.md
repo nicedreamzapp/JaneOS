@@ -2,13 +2,11 @@
 
 > **What it is:** a voice-guided AI tutor for kids ages 5–7 (kindergarten through 2nd grade). Free. Open source. Runs on your computer. No subscription, no ads, no in-app purchases — ever.
 
-### 📺 Watch the demo
+### 📺 Watch a kid play (10 minutes, safe for kids to watch)
 
-| 30-second sizzle | Full 10-minute gameplay (kid-watchable) |
-|---|---|
-| [![30-second demo](https://img.youtube.com/vi/AAPD_l9pUNE/maxresdefault.jpg)](https://www.youtube.com/watch?v=AAPD_l9pUNE) | [![10-minute gameplay](https://img.youtube.com/vi/PliIq2PslKs/maxresdefault.jpg)](https://www.youtube.com/watch?v=PliIq2PslKs) |
+[![10-minute kid gameplay](https://img.youtube.com/vi/utoQ2ecsm64/maxresdefault.jpg)](https://www.youtube.com/watch?v=utoQ2ecsm64)
 
-> *Click either thumbnail to watch on YouTube. The full gameplay video is safe for kids to watch end-to-end.*
+> *A real 10-minute session with Bloom — the warm voice you hear is the in-game tutor talking to your kid. Marked Made for Kids on YouTube.*
 
 🎮 **Live demo (try it on a phone or tablet right now):** https://golf-dried-pierre-harry.trycloudflare.com
 
