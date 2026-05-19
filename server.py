@@ -34,12 +34,12 @@ DB_PATH = DATA_DIR / "jane.db"
 LLM_LABEL = "claude-cli (Max plan)"
 
 # --- Tutor system prompt ---
-TUTOR_PROMPT = """You are Jane's personal learning friend. Jane is in 1st grade and her attention span is short — keep everything punchy and joyful.
+TUTOR_PROMPT = """You are a personal learning friend for a first grader. Their attention span is short — keep everything punchy and joyful.
 
 PERSONA
 - Warm, playful, silly when it helps, always celebrating effort over outcome.
-- Talk like a favorite kindergarten teacher who is also a little goofy.
-- Use her name often. Never condescend. Never use baby talk.
+- Talk like a favorite first-grade teacher who is also a little goofy.
+- Do not use the kid's name. Do not assume gender — speak directly to them ("you", "let's", "great job") without pronouns or names. Never condescend. Never use baby talk.
 
 OUTPUT RULES — MUST FOLLOW
 - Always reply with ONE valid JSON object, no prose, no markdown fences.
@@ -63,19 +63,19 @@ OUTPUT RULES — MUST FOLLOW
 ATTENTION-SPAN RULES
 - Activities last 60-90 seconds. Keep instructions to 1 sentence.
 - Switch modality every 1-2 activities (read -> count -> trace -> story -> phonics).
-- Rotate themes she likes; never repeat the same theme twice in a row.
+- Rotate the themes the kid likes; never repeat the same theme twice in a row.
 - After 3 wrong in a row: drop difficulty by 1 and say something encouraging.
 - After 3 right in a row: bump difficulty by 1 and celebrate big.
-- If she goes quiet, ask a silly question to re-engage.
+- If they go quiet, ask a silly question to re-engage.
 
 ASSESSMENT (FIRST SESSION ONLY)
-- For an unknown student, mix 5-7 quick checks across reading + math at increasing difficulty to find her level.
+- For an unknown student, mix 5-7 quick checks across reading + math at increasing difficulty to find their level.
 - Mark these activities with "skill": "assessment".
 
 NEVER include emoji in "say" — they sound bad in TTS. Plain words only.
 NEVER write more than 2 sentences in "say".
-NEVER ask Jane to type — she's 6.
-NEVER ask Jane to speak. She answers by CLICKING. Always provide an "items" array of 2-5 PLAIN STRINGS. "expects" must be "tap" or "trace" only (internal token — kid sees "click").
+NEVER ask the kid to type — they are first grade.
+NEVER ask the kid to speak. They answer by CLICKING. Always provide an "items" array of 2-5 PLAIN STRINGS. "expects" must be "tap" or "trace" only (internal token — kid sees "click").
 For free-response or trace activities (writing letters), set expects="trace" and answer to the target letter/word.
 ALWAYS include a "difficulty" integer 1-5.
 
@@ -84,11 +84,15 @@ EXAMPLE valid output:
 
 CRITICAL — NEVER generate "math_count" activities. The system handles all counting tasks. Pick from: math_add, math_sub, math_place_value, sight_words, phonics_cvc, reading_fluency, science, social, sel.
 
-CRITICAL — Whatever the kid is being asked to identify or count, that thing MUST appear visually in the title or items. Never say "how many stars?" without putting actual stars on screen — that confuses her. Use emojis IN the title to show what to count if needed.
+CRITICAL — Whatever the kid is being asked to identify or count, that thing MUST appear visually in the title or items. Never say "how many stars?" without putting actual stars on screen — that confuses the kid. Use emojis IN the title to show what to count if needed.
 
 CRITICAL — For MATH activities (skill starts with math_), the title is JUST the math expression, NOTHING ELSE. Examples: "3 + 2 = ?", "10 − 4 = ?", "13". Never prefix with theme emojis like "🚀 3 + 2 = ?".
 
-CRITICAL — Phonics/sight-word titles are JUST the letter or word being practiced. Examples: "C...", "WHEN", "GOOD". Never decorative names like "Mermaid Magic" — the title must be the actual learning content.
+CRITICAL — Phonics/sight-word titles must show the LEARNING CUE, never the answer.
+- For sight_words: title is the target word in caps so the kid reads it. Then "items" are 4 sight words including the target. Example: title="WHEN", items=["when","what","with","will"], answer="when". (The kid READS the title and matches it.)
+- For phonics_cvc: NEVER print the letter being practiced. Show the WORD/PICTURE the kid must analyze, and ask them to pick the starting letter. Example: title="🌞 sun", say="What letter does this start with? Click it!", items=["S","T","M","P"], answer="S". WRONG: title="S..." with answer="S" — that gives the answer away.
+- Never put the answer string anywhere on the title or in any visible field except inside "items".
+- Never repeat the same skill more than twice in a row — vary across math, phonics, sight_words, reading_fluency, science, social, sel.
 """
 
 
@@ -132,7 +136,7 @@ def db_init():
     );
     """)
     # Seed prefs if empty
-    cur.execute("INSERT OR IGNORE INTO prefs (key, value) VALUES ('name', 'Jane')")
+    cur.execute("INSERT OR IGNORE INTO prefs (key, value) VALUES ('name', '')")
     cur.execute("INSERT OR IGNORE INTO prefs (key, value) VALUES ('themes', ?)",
                 (json.dumps(["unicorns", "dinos", "mermaids", "bluey", "space", "cats", "horses"]),))
     cur.execute("INSERT OR IGNORE INTO prefs (key, value) VALUES ('tutor_name', 'Bloom')")
@@ -344,19 +348,34 @@ _LLM_HEALTHY = True
 _LLM_LAST_FAIL = 0
 
 
+def _recent_titles_from_db(limit=12):
+    """Last N attempt titles, so the LLM knows what was just shown."""
+    try:
+        con = sqlite3.connect(DB_PATH)
+        cur = con.cursor()
+        cur.execute("SELECT prompt FROM attempts ORDER BY id DESC LIMIT ?", (limit,))
+        rows = [r[0] for r in cur.fetchall() if r[0]]
+        con.close()
+        return rows
+    except Exception:
+        return []
+
+
 async def _llm_one_activity(theme_pin=None):
     """Generate one activity using LLM, with current student state."""
-    name = get_pref("name", "Jane")
+    name = get_pref("name", "")
     fav = theme_pin or get_pref("favorite_theme")
     mastery = mastery_summary()
     weak = [m["skill"] for m in mastery if m["score"] < 0.5][:5]
     strong = [m["skill"] for m in mastery if m["score"] > 0.85][:5]
     is_first = len(mastery) < 3
+    recent = _recent_titles_from_db(12)
     msg = f"""STUDENT: {name}, age 6, 1st grade.
 THEME: {fav or 'pick one of unicorns/mermaids/dinos/space/cats/horses/bluey'}
 WEAK_SKILLS: {weak or 'unknown — assess first'}
 STRONG_SKILLS: {strong or 'unknown'}
 ASSESSMENT_MODE: {is_first}
+RECENT_TITLES (do NOT repeat any of these — pick a different word/problem): {recent or 'none yet'}
 
 Output ONE 60-90s click activity in the JSON schema. Items must be plain strings."""
     p = await llm([{"role": "user", "content": msg}])
@@ -403,7 +422,7 @@ async def parent(req):
 
 async def api_state(req):
     return web.json_response({
-        "name": get_pref("name", "Jane"),
+        "name": get_pref("name", ""),
         "tutor_name": get_pref("tutor_name", "Bloom"),
         "themes": json.loads(get_pref("themes", '["unicorns"]')),
         "favorite_theme": get_pref("favorite_theme"),
@@ -458,25 +477,35 @@ async def api_next(req):
     weak = [m["skill"] for m in mastery if m["score"] < 0.6]
     target_skill = random.choice(weak) if weak and random.random() < 0.5 else None
 
-    # 1) Try the LLM queue with a tiny timeout — if we have one ready, use it
-    if _QUEUE is not None and not _QUEUE.empty():
-        try:
-            p = _QUEUE.get_nowait()
-            # Re-validate at serve time (themes change, schema may have stale items)
-            ok, _ = _validate_activity(p)
-            if ok:
+    recent_titles = {h.get("prompt", "") for h in history if h.get("prompt")}
+
+    def _queued_is_fresh(p):
+        ok, _ = _validate_activity(p)
+        if not ok:
+            return False
+        title = (p.get("screen") or {}).get("title", "")
+        return title not in recent_titles
+
+    # 1) Try the LLM queue — drain up to 3 stale items if Haiku is repeating itself
+    if _QUEUE is not None:
+        for _ in range(3):
+            if _QUEUE.empty():
+                break
+            try:
+                p = _QUEUE.get_nowait()
+            except asyncio.QueueEmpty:
+                break
+            if _queued_is_fresh(p):
                 if theme_pin and isinstance(p.get("screen"), dict):
                     p["screen"]["theme"] = theme_pin
                 return web.json_response(p)
-        except asyncio.QueueEmpty:
-            pass
+            # else: drop and try the next queued item
 
     # 2) Wait for queue briefly only if LLM is healthy (otherwise bank wins immediately)
     if _QUEUE is not None and _LLM_HEALTHY:
         try:
             p = await asyncio.wait_for(_QUEUE.get(), timeout=0.1)
-            ok, _ = _validate_activity(p)
-            if ok:
+            if _queued_is_fresh(p):
                 if theme_pin and isinstance(p.get("screen"), dict):
                     p["screen"]["theme"] = theme_pin
                 return web.json_response(p)
@@ -484,7 +513,6 @@ async def api_next(req):
             pass
 
     # 3) Bank fallback — INSTANT, always works, even offline
-    recent_titles = {h.get("prompt", "") for h in history if h.get("prompt")}
     p = activity_bank.serve(skill=target_skill, theme=theme_pin, exclude_titles=recent_titles)
     return web.json_response(p)
 
@@ -512,8 +540,8 @@ async def api_grade(req):
         return web.json_response({"correct": True, "feedback": "number-normalized"})
 
     # Otherwise ask LLM
-    sys = "You judge whether a 6-year-old's spoken answer is correct. Be generous on pronunciation. Return only JSON: {\"correct\": true|false, \"feedback\": \"one short kind sentence\"}"
-    msg = f"Skill: {skill}\nExpected answer: {expected}\nWhat she said: {got}\nIs that right?"
+    sys = "You judge whether a first grader's spoken answer is correct. Be generous on pronunciation. Return only JSON: {\"correct\": true|false, \"feedback\": \"one short kind sentence\"}"
+    msg = f"Skill: {skill}\nExpected answer: {expected}\nWhat the kid said: {got}\nIs that right?"
     try:
         result = await llm([{"role": "user", "content": msg}], system=sys)
         return web.json_response(result)
